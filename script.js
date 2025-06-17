@@ -2,23 +2,29 @@ const taskInput = document.getElementById("taskInput");
 const addTaskBtn = document.getElementById("addTaskBtn");
 const taskList = document.getElementById("taskList");
 
-function getTasks() {
-  const tasksJSON = localStorage.getItem("tarefas");
-  return tasksJSON ? JSON.parse(tasksJSON) : [];
+var tarefas = []
+
+function salvarTarefa() {
+  localStorage.setItem("tarefas", JSON.stringify(tarefas))
 }
 
-function saveTasks(tasks) {
-  localStorage.setItem("tarefas", JSON.stringify(tasks));
-}
 
-addTaskBtn.addEventListener("click", () => {
-  const taskText = taskInput.value.trim();
+function carregaTarefas() {
 
-  if (taskText === "") {
-    alert("Por favor, digite uma tarefa!");
-    return;
+  const tarefasString = localStorage.getItem('tarefas');
+
+  const arr = JSON.parse(tarefasString) || [];
+
+  for (let i = 0; i < arr.length; i++) {
+    tarefas.push(arr[i]);
+    addElementos(arr[i]);
   }
 
+  salvarTarefa();
+}
+
+
+function addElementos(taskText) {
   const card = document.createElement("div");
   card.className = "columns is-mobile is-centered";
   card.id = "card";
@@ -34,6 +40,9 @@ addTaskBtn.addEventListener("click", () => {
 
   deleteBtn.addEventListener("click", () => {
     card.remove();
+    const index = tarefas.indexOf(taskText);
+    tarefas.splice(index, 1);
+    salvarTarefa();
   });
 
   const btnColumn = document.createElement("div");
@@ -49,4 +58,25 @@ addTaskBtn.addEventListener("click", () => {
   // Limpar campo de entrada e focar novamente
   taskInput.value = "";
   taskInput.focus();
+
+
+}
+
+
+addTaskBtn.addEventListener("click", () => {
+  const taskText = taskInput.value.trim();
+
+  if (taskText === "") {
+    alert("Por favor, digite uma tarefa!");
+    return;
+  }
+
+  tarefas.push(taskText);
+  salvarTarefa();
+
+  addElementos(taskText)
+
 });
+
+
+window.onload = carregaTarefas;
